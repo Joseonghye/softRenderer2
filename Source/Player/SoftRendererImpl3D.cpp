@@ -3,6 +3,8 @@
 #include "SoftRendererImpl3D.h"
 #include "SoftRenderer.h"
 
+#include "GameObject.h"
+
 SoftRendererImpl3D::SoftRendererImpl3D(SoftRenderer* InOwner)
 {
 	RSI = InOwner->RSI.get();
@@ -19,8 +21,8 @@ void SoftRendererImpl3D::RenderFrameImpl()
 {
 	assert(RSI != nullptr && RSI->IsInitialized() && !ScreenSize.HasZero());
 
-	const int vertexCount = 24;
-	static Vector4 v[vertexCount] = {
+	cube.Mesh.Verteies=
+	 {
 		// Front 
 		Vector4(0.5f, -0.5f, 0.5f),
 		Vector4(0.5f, 0.5f, 0.5f),
@@ -52,10 +54,13 @@ void SoftRendererImpl3D::RenderFrameImpl()
 		Vector4(0.5f, -0.5f, -0.5f),
 		Vector4(-0.5f, -0.5f, -0.5f)
 	};
+	//const int vertexCount = 24;
+	//static Vector4 v[vertexCount] =
 
-	const int triangleCount = 12;
+	/*const int triangleCount = 12;
 	const int indexCount = triangleCount * 3;
-	static int i[indexCount] = {
+	static int i[indexCount] =*/
+	cube.Mesh.Indices = {
 	 0, 2, 1, 0, 3, 2,
 	 4, 6, 5, 4, 7, 6,
 	 8, 10, 9, 8, 11, 10,
@@ -121,7 +126,12 @@ void SoftRendererImpl3D::UpdateImpl(float DeltaSeconds)
 	cubePos += Vector3::UnitZ * InputManager.GetYAxis() * moveSpeed * DeltaSeconds;
 	cubeRotationY += InputManager.GetXAxis() * rotateSpeed * DeltaSeconds;
 
-	float cy, sy, cp, sp, cr, sr;
+	
+	cube.GetTransform().SetPosition(cubePos);
+	cube.GetTransform().SetRotation(Vector3(cubeRotationX, cubeRotationY, cubeRotationZ));
+	cube.GetTransform().SetScale(Vector3(cubeScaleXYZ, cubeScaleXYZ, cubeScaleXYZ));
+
+	/*float cy, sy, cp, sp, cr, sr;
 	Math::GetSinCos(cy, sy, cubeRotationY);
 	Math::GetSinCos(cp, sp, cubeRotationX);
 	Math::GetSinCos(cr, sr, cubeRotationZ);
@@ -134,7 +144,7 @@ void SoftRendererImpl3D::UpdateImpl(float DeltaSeconds)
 		Vector4::UnitW);
 
 	Matrix4x4 sMat(Vector4::UnitX * cubeScaleXYZ, Vector4::UnitY * cubeScaleXYZ, Vector4::UnitZ * cubeScaleXYZ, Vector4::UnitW);
-	Matrix4x4 mMat = tMat * rMat * sMat;
+	Matrix4x4 mMat = tMat * rMat * sMat;*/
 
 	// 카메라 변환 행렬.
 	static Vector3 cameraPos(0.f, 500.f, -500.f);
@@ -165,5 +175,5 @@ void SoftRendererImpl3D::UpdateImpl(float DeltaSeconds)
 		Vector4(0.f, 0.f, (2 * n*f)*repnf, 0.f));
 
 	// 최종 행렬
-	FinalMatrix = pMat * vMat * mMat;
+	//FinalMatrix = pMat * vMat * mMat;
 }

@@ -16,6 +16,8 @@ public:
 private:
 	RenderingSoftwareInterface* RSI = nullptr;
 
+	GameObject cube;
+
 	// 2D Grid Options
 	int Grid2DUnit = 10;
 	ScreenPoint ScreenSize;
