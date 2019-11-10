@@ -2,6 +2,8 @@
 
 #include "RenderingSoftwareInterface.h"
 #include "InputManager.h"
+#include "GameObject.h"
+#include "Camera.h"
 
 class SoftRendererImpl3D
 {
@@ -17,6 +19,7 @@ private:
 	RenderingSoftwareInterface* RSI = nullptr;
 
 	GameObject cube;
+	Camera camera;
 
 	// 2D Grid Options
 	int Grid2DUnit = 10;

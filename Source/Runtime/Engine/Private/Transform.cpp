@@ -3,18 +3,18 @@
 #include "Transform.h"
 
 
-Matrix3x3 Transform::GetTRS() const
+Matrix4x4 Transform::GetTRS() const
 {
-	Matrix3x3 tMat = Matrix3x3(Vector3::UnitX, Vector3::UnitY, Vector3(Position.X, Position.Y, Position.Z));
+	Matrix4x4 tMat(Vector4::UnitX, Vector4::UnitY, Vector4::UnitZ, Vector4(Position));
 //	Matrix3x3 rMat = Matrix3x3(Vector3(cosf(rad), sinf(rad), 0.f), Vector3(-sinf(rad), cosf(rad), 0.f), Vector3::UnitZ);
-	Matrix3x3 sMat = Matrix3x3(Vector3::UnitX * Scale.X, Vector3::UnitY * Scale.Y, Vector3::UnitZ * Scale.Z);
-	return tMat * sMat;
+	Matrix4x4 sMat = Matrix4x4(Vector3::UnitX * Scale.X, Vector3::UnitY * Scale.Y, Vector3::UnitZ * Scale.Z, Vector4::UnitW);
+	return tMat *Rotation * sMat;
 }
 
 void Transform::SetPosition(const Vector3 & InPosition)
 {
 	Position = InPosition;
-}
+} 
 
 void Transform::SetRotation(Vector3 InRotationDegree)
 {
@@ -38,10 +38,6 @@ void Transform::SetScale(const Vector3 & InScale)
 void Transform::AddPosition(const Vector3 & InPosition)
 {
 	Position += InPosition;
-}
-
-void Transform::AddRotation(Vector3 InRotationDegree)
-{
 }
 
 void Transform::AddScale(const Vector3 & InScale)

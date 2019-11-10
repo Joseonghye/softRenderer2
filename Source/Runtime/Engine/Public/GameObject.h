@@ -11,10 +11,9 @@ public:
 	GameObject(){}
 
 	Transform& GetTransform();
+	Mesh& GetMesh();
 
-
+private:
 	Transform Transform;
 	Mesh Mesh;
-
-	Matrix4x4 Mat;
 };

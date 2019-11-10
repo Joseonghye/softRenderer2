@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Vector3.h"
-#include "Matrix3x3.h"
+#include "Matrix4x4.h"
 
 class Transform
 {
 public:
-	Matrix3x3 GetTRS() const;
+	Matrix4x4 GetTRS() const;
 
 	void SetPosition(const Vector3& InPosition);
 	Vector3 GetPosition() { return Position; }
@@ -15,7 +15,6 @@ public:
 	void SetScale(const Vector3& InScale);
 
 	void AddPosition(const Vector3& InPosition);
-	void AddRotation(Vector3 InRotationDegree);
 	void AddScale(const Vector3& InScale);
 
 private:

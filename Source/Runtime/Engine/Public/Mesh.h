@@ -7,9 +7,28 @@ using namespace std;
 
 class Mesh
 {
-	int GetVertexCount() { return Verteies.size(); }
-	int GetTriangleSize() { return Indices.size() / 3.f; }
+public:
+	void SetVertex (int vc, Vector4* v ) 
+	{
+		VertexCount = vc;
+		Verties = new Vector4[vc];
+		Verties = v;
+	}
+	void SetIndex(int tc, int* i)
+	{
+		TriangleCount = tc;
+		IndexCount = tc * 3;
+		Indices = new int[IndexCount];
+		Indices = i;
+	}
 
-	list<Vector4> Verteies;
-	list<int> Indices;
+	int GetVertexCount() { return VertexCount; }
+	int GetTriangleSize() { return IndexCount/3; }
+
+	int VertexCount;
+	int IndexCount;
+	int TriangleCount;
+
+	Vector4* Verties;
+	int* Indices;
 };

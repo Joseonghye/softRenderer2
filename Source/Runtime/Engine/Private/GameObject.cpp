@@ -1,17 +1,13 @@
 
 #include "Precompiled.h"
-#include "GameEngine.h"
-#include "..\Public\GameObject.h"
-
-void GameEngine::Shutdown()
-{
-}
-
-void GameEngine::Init()
-{
-}
+#include "GameObject.h"
 
 Transform & GameObject::GetTransform()
 {
 	return Transform;
+}
+
+Mesh & GameObject::GetMesh()
+{
+	return Mesh;
 }
