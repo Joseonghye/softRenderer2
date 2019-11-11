@@ -12,6 +12,8 @@ public:
 	~SoftRendererImpl3D();
 
 public:
+	void LoadResource();
+	void LoadScene();
 	void RenderFrameImpl();
 	void UpdateImpl(float DeltaSeconds);
 
@@ -19,6 +21,9 @@ private:
 	RenderingSoftwareInterface* RSI = nullptr;
 
 	GameObject cube;
+	GameObject box;
+	GameObject box2;
+
 	Camera camera;
 
 	// 2D Grid Options
@@ -28,7 +33,4 @@ private:
 	// Input Manager
 	InputManager InputManager;
 
-	// Final Matrix
-	Matrix4x4 FinalMatrix;
-	float FOV = 60.f;
 };
