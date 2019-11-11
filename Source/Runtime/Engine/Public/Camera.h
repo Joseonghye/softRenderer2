@@ -7,10 +7,11 @@ class Camera
 public:
 	void SetPosition(const Vector3& InPosition);
 	Vector3 GetPosition() { return Position; }
-	void SetRotation(Vector3 viewX, Vector3 viewY, Vector3 viewZ);
+	void SetRotation(Vector3 InRotationDegree);
 	
 	Matrix4x4 GetViewMat();
 	Matrix4x4 GetPerspectiveMat();
+	Matrix4x4 GetLookAtMat(Vector3 obj);
 
 	//½Ã¾ß°¢
 	float FOV = 60.f;

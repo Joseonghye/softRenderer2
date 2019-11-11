@@ -23,7 +23,7 @@ public:
 	}
 
 	int GetVertexCount() { return VertexCount; }
-	int GetTriangleSize() { return IndexCount/3; }
+	int GetTriangleSize() { return TriangleCount; }
 
 	int VertexCount;
 	int IndexCount;
