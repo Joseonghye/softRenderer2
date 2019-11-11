@@ -74,23 +74,24 @@ void SoftRendererImpl3D::RenderFrameImpl()
 
 	
 	Vector3 camera = -Vector3::UnitZ;
+	Vector4* vertices = cube.GetMesh().Verties;
+	int* indexDatas = cube.GetMesh().Indices;
 
 	for (int t = 0; t < cube.GetMesh().GetTriangleSize(); t++)
 	{
 		Vector4 tp[3];
-		int num[3] = { cube.GetMesh().Indices[t * 3] ,cube.GetMesh().Indices[t * 3 + 1],cube.GetMesh().Indices[t * 3 + 2] };
-		tp[0] = cube.GetMesh().Verties[num[0]];
-		tp[1] = cube.GetMesh().Verties[num[1]];
-		tp[2] = cube.GetMesh().Verties[num[2]];
+		tp[0] = vertices[indexDatas[t * 3]];
+		tp[1] = vertices[indexDatas[t * 3 + 1]];
+		tp[2] = vertices[indexDatas[t * 3 + 2]];
 
 		for (int ti = 0; ti < 3; ti++)
 		{
 			tp[ti] = FinalMatrix * tp[ti];
-		//	tp[ti] = tp[ti] * (1/tp[ti].W);
-		
-			tp[ti].X = tp[ti].X / tp[ti].W;
-			tp[ti].Y = tp[ti].Y / tp[ti].W;
-			tp[ti].Z = tp[ti].Z / tp[ti].W;
+			float repW = 1.f / tp[ti].W;
+
+		//	tp[ti].X *= repW;
+		//	tp[ti].Y *= repW;
+		//	tp[ti].Z *= repW;
 		}
 
 		//BackFace Culling
@@ -99,13 +100,13 @@ void SoftRendererImpl3D::RenderFrameImpl()
 
 		Vector3 normal = -edge1.Cross(edge2).Normalize();
 		
-		if (normal.Dot(camera) <= 0.f)
+		if (camera.Dot(normal) <= 0.f)
 		{
 			// 종횡비가 다르기에 원래대로 맞춰주기 위해서 
 			for (int ti = 0; ti < 3; ti++)
 			{
-				tp[ti].X *= (ScreenSize.X * 0.5f);
-				tp[ti].Y *= (ScreenSize.Y * 0.5f);
+			//	tp[ti].X *= (ScreenSize.X * 0.5f);
+			//	tp[ti].Y *= (ScreenSize.Y * 0.5f);
 			}
 
 			RSI->DrawLine(tp[0].ToVector2(), tp[1].ToVector2(), LinearColor::Red);
@@ -121,19 +122,16 @@ void SoftRendererImpl3D::UpdateImpl(float DeltaSeconds)
 	// 모델링 변환 행렬.
 	static Vector3 cubePos = Vector3::Zero;
 	static float cubeRotationY = 0.f;
-	static float cubeRotationX = 0.f;
-	static float cubeRotationZ = 0.f;
-	static float cubeScaleXYZ = 100.f;
-
 	static float moveSpeed = 100.f;
 	static float rotateSpeed = 180.f;
+
 	cubePos += Vector3::UnitZ * InputManager.GetYAxis() * moveSpeed * DeltaSeconds;
 	cubeRotationY += InputManager.GetXAxis() * rotateSpeed * DeltaSeconds;
 
 	
 	cube.GetTransform().SetPosition(cubePos);
-	cube.GetTransform().SetRotation(Vector3(cubeRotationX, cubeRotationY, cubeRotationZ));
-	cube.GetTransform().SetScale(Vector3(cubeScaleXYZ, cubeScaleXYZ, cubeScaleXYZ));
+	cube.GetTransform().SetRotation(Vector3(0.f, cubeRotationY, 0.f));
+	cube.GetTransform().SetScale(Vector3(100.f, 100.f, 100.f));
 
 	/*float cy, sy, cp, sp, cr, sr;
 	Math::GetSinCos(cy, sy, cubeRotationY);
@@ -152,23 +150,23 @@ void SoftRendererImpl3D::UpdateImpl(float DeltaSeconds)
 
 	// 카메라 변환 행렬.
 	camera.SetPosition(Vector3(0.f, 500.f, -500.f));
-	static Vector3 cameraPos(0.f, 500.f, -500.f);
+	camera.SetRotation(Vector3::Zero);
 
-	Vector3 viewZ = (camera.GetPosition() - cube.GetTransform().GetPosition()).Normalize();
+	/*Vector3 viewZ = (camera.GetPosition() - cube.GetTransform().GetPosition()).Normalize();
 	Vector3 viewX = Vector3::UnitY.Cross(viewZ).Normalize();
 	if (viewX.IsZero())
 	{
 		viewX = Vector3::UnitX;
 	}
-	Vector3 viewY = viewX.Cross(viewZ).Normalize();
+	Vector3 viewY = viewX.Cross(viewZ).Normalize();*/
 
-	camera.SetRotation(viewX, viewY, viewZ);
-	Matrix4x4 virMat = Matrix4x4(Vector4(viewX, false), Vector4(viewY, false), Vector4(viewZ, false), Vector4::UnitW).Tranpose();
+//	camera.SetRotation(viewX, viewY, viewZ);
+	/*Matrix4x4 virMat = Matrix4x4(Vector4(viewX, false), Vector4(viewY, false), Vector4(viewZ, false), Vector4::UnitW).Tranpose();
 	Matrix4x4 vitMat = Matrix4x4(Vector4::UnitX, Vector4::UnitY, Vector4::UnitZ, Vector4(-cameraPos));
-	Matrix4x4 vMat = virMat * vitMat;
+	Matrix4x4 vMat = virMat * vitMat;*/
 
 	// 투영 행렬
-	static float repA = (float)ScreenSize.Y / (float)ScreenSize.X;
+	/*static float repA = (float)ScreenSize.Y / (float)ScreenSize.X;
 	static float d = 1.f / tanf(Math::Deg2Rad(FOV) * 0.5f);
 	static float n = 5.5f;
 	static float f = 100.f;
@@ -178,10 +176,10 @@ void SoftRendererImpl3D::UpdateImpl(float DeltaSeconds)
 		Vector4(d*repA, 0.f, 0.f, false),
 		Vector4(0.f, d, 0.f, false), 
 		Vector4(0.f, 0.f, (n + f)* repnf,-1.f ), 
-		Vector4(0.f, 0.f, (2 * n*f)*repnf, 0.f));
+		Vector4(0.f, 0.f, (2 * n*f)*repnf, 0.f));*/
 
 	camera.repA = (float)ScreenSize.Y / (float)ScreenSize.X;
 	// 최종 행렬
 	//FinalMatrix = pMat * vMat * cube.GetTransform().GetTRS(); //* mMat;
-	FinalMatrix = camera.GetPerspectiveMat() * camera.GetViewMat() * cube.GetTransform().GetTRS();
+	FinalMatrix = camera.GetPerspectiveMat() * camera.GetLookAtMat(cubePos) * cube.GetTransform().GetTRS();
 }
