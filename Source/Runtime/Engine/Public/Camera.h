@@ -6,9 +6,14 @@ class Camera
 {
 public:
 	void SetPosition(const Vector3& InPosition);
+	void AddPosition(const Vector3 & InPosition);
 	Vector3 GetPosition() { return Position; }
+
 	void SetRotation(Vector3 InRotationDegree);
-	
+	void AddYawRotation(float InDegree);
+	void AddRollRotation(float InDegree);
+	void AddPitchRotation(float InDegree);
+
 	Matrix4x4 GetViewMat();
 	Matrix4x4 GetPerspectiveMat();
 	Matrix4x4 GetLookAtMat(Vector3 obj);
@@ -23,6 +28,5 @@ public:
 
 private:
 	Vector3 Position = Vector3::Zero;
-	Matrix4x4 Rotation;
-
+	Vector3 Rotation = Vector3::Zero;
 };

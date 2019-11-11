@@ -9,16 +9,18 @@ public:
 	Matrix4x4 GetTRS() const;
 
 	void SetPosition(const Vector3& InPosition);
+	void AddPosition(const Vector3& InPosition);
 	Vector3 GetPosition() { return Position; }
 
 	void SetRotation(Vector3 InRotationDegree);
-	void SetScale(const Vector3& InScale);
+	void AddYawRotation(float InDegree);
+	void AddRollRotation(float InDegree);
+	void AddPitchRotation(float InDegree);
 
-	void AddPosition(const Vector3& InPosition);
-	void AddScale(const Vector3& InScale);
+	void SetScale(const Vector3& InScale);
 
 private:
 	Vector3 Position = Vector3::Zero;
-	Matrix4x4 Rotation;
+	Vector3 Rotation = Vector3::Zero;
 	Vector3 Scale = Vector3::One;
 };

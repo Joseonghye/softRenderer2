@@ -1,34 +1,29 @@
 #pragma once
-
-#include <list>
 #include "Vector4.h"
-
-using namespace std;
 
 class Mesh
 {
 public:
-	void SetVertex (int vc, Vector4* v ) 
+	void SetMesh (int InVertexCount, Vector4* InV,int InIndexCount, int* InI)
 	{
-		VertexCount = vc;
-		Verties = new Vector4[vc];
-		Verties = v;
-	}
-	void SetIndex(int tc, int* i)
-	{
-		TriangleCount = tc;
-		IndexCount = tc * 3;
+		VertexCount = InVertexCount;
+		Vertices = new Vector4[VertexCount];
+		Vertices = InV;
+
+		IndexCount = InIndexCount;
 		Indices = new int[IndexCount];
-		Indices = i;
+		Indices = InI;
 	}
 
-	int GetVertexCount() { return VertexCount; }
-	int GetTriangleSize() { return TriangleCount; }
-
+	int GetVertexCount() const { return VertexCount; }
+	int GetIndexCount() const { return IndexCount; }
+	int GetTriangleSize() { return IndexCount / 3; }
+	Vector4* GetVertexBuffer() { return Vertices; }
+	int* GetIndexBuffer() { return Indices; }
+	
 	int VertexCount;
 	int IndexCount;
-	int TriangleCount;
 
-	Vector4* Verties;
+	Vector4* Vertices;
 	int* Indices;
 };

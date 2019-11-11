@@ -6,9 +6,20 @@
 Matrix4x4 Transform::GetTRS() const
 {
 	Matrix4x4 tMat(Vector4::UnitX, Vector4::UnitY, Vector4::UnitZ, Vector4(Position));
-//	Matrix3x3 rMat = Matrix3x3(Vector3(cosf(rad), sinf(rad), 0.f), Vector3(-sinf(rad), cosf(rad), 0.f), Vector3::UnitZ);
-	Matrix4x4 sMat = Matrix4x4(Vector3::UnitX * Scale.X, Vector3::UnitY * Scale.Y, Vector3::UnitZ * Scale.Z, Vector4::UnitW);
-	return tMat *Rotation * sMat;
+
+	float cy, sy, cp, sp, cr, sr;
+	Math::GetSinCos(cy, sy, Rotation.Y);
+	Math::GetSinCos(cp, sp, Rotation.X);
+	Math::GetSinCos(cr, sr, Rotation.Z);
+
+	Matrix4x4 rMat = Matrix4x4(
+		Vector4(cr * cy + sr * sp * sy, cy * sr - cr * sp * sy, -cp * sy, false),
+		Vector4(-sr * cp, cr * cp, -sp, false),
+		Vector4(cr * sy - sr * sp * cy, sr * sy + cr * sp * cy, cp * cy, false),
+		Vector4::UnitW);
+
+	Matrix4x4 sMat(Vector4::UnitX * Scale.X, Vector4::UnitY * Scale.Y, Vector4::UnitZ * Scale.Z, Vector4::UnitW);
+	return tMat * rMat * sMat;
 }
 
 void Transform::SetPosition(const Vector3 & InPosition)
@@ -16,18 +27,29 @@ void Transform::SetPosition(const Vector3 & InPosition)
 	Position = InPosition;
 } 
 
+void Transform::AddPosition(const Vector3 & InPosition)
+{
+	Position += InPosition;
+}
+
 void Transform::SetRotation(Vector3 InRotationDegree)
 {
-	float cy, sy, cp, sp, cr, sr;
-	Math::GetSinCos(cy, sy, InRotationDegree.Y);
-	Math::GetSinCos(cp, sp, InRotationDegree.X);
-	Math::GetSinCos(cr, sr, InRotationDegree.Z);
+	Rotation = InRotationDegree;
+}
 
-	Rotation = Matrix4x4 (
-		Vector4(cr * cy + sr * sp * sy, cy * sr - cr * sp * sy, -cp * sy, false),
-		Vector4(-sr * cp, cr * cp, -sp, false),
-		Vector4(cr * sy - sr * sp * cy, sr * sy + cr * sp * cy, cp * cy, false),
-		Vector4::UnitW);
+void Transform::AddYawRotation(float InDegree)
+{
+	Rotation.Y += InDegree;
+}
+
+void Transform::AddRollRotation(float InDegree)
+{
+	Rotation.Z += InDegree;
+}
+
+void Transform::AddPitchRotation(float InDegree)
+{
+	Rotation.X += InDegree;
 }
 
 void Transform::SetScale(const Vector3 & InScale)
@@ -35,12 +57,4 @@ void Transform::SetScale(const Vector3 & InScale)
 	Scale = InScale;
 }
 
-void Transform::AddPosition(const Vector3 & InPosition)
-{
-	Position += InPosition;
-}
 
-void Transform::AddScale(const Vector3 & InScale)
-{
-	Scale += InScale;
-}
