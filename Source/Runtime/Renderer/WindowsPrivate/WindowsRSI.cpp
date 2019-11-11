@@ -140,6 +140,63 @@ void WindowsRSI::DrawFullHorizontalLine(int InY, const LinearColor & InColor)
 	}
 }
 
+void WindowsRSI::SetUniformMatrix(Matrix4x4 * InMatrixData)
+{
+	UniformMatrix = InMatrixData[0] * InMatrixData[1] * InMatrixData[2];
+}
+
+void WindowsRSI::SetVertexBuffer(VertexData * InVertexData)
+{
+	Vertices = InVertexData;
+}
+
+void WindowsRSI::SetIndexBuffer(int * InIndexData)
+{
+	Indices = InIndexData;
+}
+
+void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
+{
+	for (int t = 0; t < InIndexSize / 3; t++)
+	{
+		VertexData tp[3];
+		tp[0] = Vertices[Indices[t * 3]];
+		tp[1] = Vertices[Indices[t * 3 + 1]];
+		tp[2] = Vertices[Indices[t * 3 + 2]];
+
+		for (int ti = 0; ti < 3; ti++)
+		{
+			tp[ti].Position = UniformMatrix * tp[ti].Position;
+			float repW = 1.f / tp[ti].Position.W;
+
+			tp[ti].Position.X *= repW;
+			tp[ti].Position.Y *= repW;
+			tp[ti].Position.Z *= repW;
+		}
+
+		//BackFace Culling
+		Vector3 edge1 = (tp[1].Position - tp[0].Position).ToVector3();
+		Vector3 edge2 = (tp[2].Position - tp[0].Position).ToVector3();
+
+		Vector3 normal = -edge2.Cross(edge1).Normalize();
+		Vector3 camera = -Vector3::UnitZ;
+
+		if (camera.Dot(normal) <= 0.f)
+		{
+			// 종횡비가 다르기에 원래대로 맞춰주기 위해서 
+			for (int ti = 0; ti < 3; ti++)
+			{
+				tp[ti].Position.X *= (ScreenSize.X * 0.5f);
+				tp[ti].Position.Y *= (ScreenSize.Y * 0.5f);
+			}
+
+			DrawLine(tp[0].Position.ToVector2(), tp[1].Position.ToVector2(), LinearColor::Red);
+			DrawLine(tp[0].Position.ToVector2(), tp[2].Position.ToVector2(), LinearColor::Red);
+			DrawLine(tp[1].Position.ToVector2(), tp[2].Position.ToVector2(), LinearColor::Red);
+		}
+	}
+}
+
 void WindowsRSI::SetPixel(const ScreenPoint& InPos, const LinearColor& InColor)
 {
 	if (BlendingMode == BlendingModes::Opaque)

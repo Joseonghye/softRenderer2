@@ -28,8 +28,17 @@ public:
 	virtual void DrawFullVerticalLine(int InX, const LinearColor& InColor) override;
 	virtual void DrawFullHorizontalLine(int InY, const LinearColor& InColor) override;
 
+	virtual void SetUniformMatrix(Matrix4x4* InMatrixData) override;
+	virtual void SetVertexBuffer(VertexData* InVertexData) override;
+	virtual void SetIndexBuffer(int* InIndexData) override;
+	virtual void DrawPrimitive(UINT InVertexSize, UINT InIndexSize) override;
+
 private:
 	void SetPixel(const ScreenPoint& InPos, const LinearColor& InColor);
+
+	Matrix4x4 UniformMatrix;
+	VertexData* Vertices;
+	int* Indices;
 
 	BlendingModes BlendingMode = BlendingModes::Opaque;
 };
