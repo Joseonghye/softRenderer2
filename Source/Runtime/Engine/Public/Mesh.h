@@ -1,29 +1,34 @@
 #pragma once
-#include "Vector4.h"
 
 class Mesh
 {
 public:
-	void SetMesh (int InVertexCount, Vector4* InV,int InIndexCount, int* InI)
+	Mesh() = default;
+	~Mesh()
 	{
-		VertexCount = InVertexCount;
-		Vertices = new Vector4[VertexCount];
-		Vertices = InV;
-
-		IndexCount = InIndexCount;
-		Indices = new int[IndexCount];
-		Indices = InI;
+		ReleaseAllBuffers();
 	}
 
 	int GetVertexCount() const { return VertexCount; }
 	int GetIndexCount() const { return IndexCount; }
-	int GetTriangleSize() { return IndexCount / 3; }
 	Vector4* GetVertexBuffer() { return Vertices; }
+	Color32* GetColorBuffer() { return Colors; }
 	int* GetIndexBuffer() { return Indices; }
-	
-	int VertexCount;
-	int IndexCount;
+	void SetMesh(int InVertexCount, int InIndexCount, Vector4* InVertexBuffer, int* InIndexBuffer);
+	void SetColor(Color32* InColorBuffer);
+	void ReleaseAllBuffers();
+	Sphere GetSphereArea() const { return SphereArea; }
 
-	Vector4* Vertices;
-	int* Indices;
+private:
+	int VertexCount = 0;
+	int IndexCount = 0;
+
+	Vector4* Vertices = nullptr;
+	Color32* Colors = nullptr;
+	int* Indices = nullptr;
+
+	BoundingBox BoundingBoxArea;
+	Sphere SphereArea;
+	Vector3 Pivot = Vector3::Zero;
 };
+

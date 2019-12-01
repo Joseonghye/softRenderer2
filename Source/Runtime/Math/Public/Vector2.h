@@ -5,7 +5,7 @@
 struct Vector2
 {
 public:
-	Vector2() { }
+	Vector2() = default;
 	FORCEINLINE Vector2(int InX, int InY) : X((float)InX), Y((float)InY) { }
 	FORCEINLINE Vector2(float InX, float InY) : X(InX), Y(InY) { }
 

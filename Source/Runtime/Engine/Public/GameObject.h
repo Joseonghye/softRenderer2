@@ -2,20 +2,19 @@
 
 #include "Transform.h"
 #include "Mesh.h"
-#include "Matrix4x4.h"
-
 
 class GameObject
 {
 public:
-	GameObject(){}
+	GameObject() = default;
+	~GameObject() {};
 
 	Transform& GetTransform() { return Transform; }
-	//Mesh& GetMesh() { return Mesh; }
-	void SetMesh(Mesh* InMeshPtr) { ShareMeshPtr = InMeshPtr; }
+	void SetMesh(Mesh* InMeshPtr);
+	Mesh* GetMesh() { return SharedMeshPtr; }
 
 private:
 	Transform Transform;
-	//Mesh Mesh;
-	Mesh* ShareMeshPtr = nullptr;
+	Mesh* SharedMeshPtr = nullptr;
 };
+

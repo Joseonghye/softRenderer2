@@ -38,7 +38,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		if (currentTime - previousTimer > updatePeriod)
 		{
 			float frameFPS = renderer.GetFrameFPS();
-			WindowsPlayer::SetWindowsStatTitle(frameFPS);
+			WindowsPlayer::SetWindowsStatTitle(frameFPS, renderer.GetCullingCount());
 			previousTimer = currentTime;
 		}
 	}

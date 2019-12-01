@@ -122,9 +122,9 @@ namespace WindowsPlayer
 		DestroyWindow(gHandle);
 	}
 
-	inline void SetWindowsStatTitle(float frameFPS)
+	inline void SetWindowsStatTitle(float frameFPS, int cullingCount)
 	{
-		_stprintf_s(gPlayTitle, "%s Current : %.2fFPS", gTitle, frameFPS);
+		_stprintf_s(gPlayTitle, "%s Current : %.2fFPS, %d object culled.", gTitle, frameFPS, cullingCount);
 		::SetWindowText(gHandle, gPlayTitle);
 	}
 }

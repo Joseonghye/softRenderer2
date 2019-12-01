@@ -21,6 +21,8 @@ public:
 
 	float GetFrameFPS() const { return FrameFPS; }
 	float GetElapsedTime() const { return ElapsedTime; }
+	int GetCullingCount() const { return FrustumCullingCount; }
+	void SetCullingCount(int InNewCullingCount) { FrustumCullingCount = InNewCullingCount; }
 
 public:
 	// Delegates
@@ -77,4 +79,7 @@ private:
 
 	// Input Manager
 	InputManager InputManager;
+
+	// Culling Stat for Homework
+	int FrustumCullingCount = 0;
 };

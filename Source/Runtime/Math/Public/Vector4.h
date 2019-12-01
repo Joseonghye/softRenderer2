@@ -5,7 +5,7 @@
 struct Vector4
 {
 public:
-	Vector4() { }
+	Vector4() = default;
 	FORCEINLINE Vector4(const Vector2& InV, bool IsPoint = true) : X(InV.X), Y(InV.Y), Z(0.f) { W = IsPoint ? 1.f : 0.f; }
 	FORCEINLINE Vector4(const Vector3& InV, bool IsPoint = true) : X(InV.X), Y(InV.Y), Z(InV.Z) { W = IsPoint ? 1.f : 0.f; }
 	FORCEINLINE Vector4(float InX, float InY, float InZ, float InW) : X(InX), Y(InY), Z(InZ), W(InW) { }
@@ -38,10 +38,10 @@ public:
 	static const Vector4 Zero;
 
 public:
-	float X = 0;
-	float Y = 0;
-	float Z = 0;
-	float W = 0;
+	float X = 0.f;
+	float Y = 0.f;
+	float Z = 0.f;
+	float W = 0.f;
 };
 
 FORCEINLINE Vector4 Vector4::operator*(float InScale) const

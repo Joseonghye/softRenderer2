@@ -6,7 +6,7 @@
 struct ScreenPoint
 {
 public:
-	ScreenPoint() : X(0), Y(0) { }
+	ScreenPoint() = default;
 	explicit ScreenPoint(int InX, int InY) : X(InX), Y(InY) { }
 	explicit ScreenPoint(float InX, float InY) : X(Math::FloorToInt(InX)), Y(Math::FloorToInt(InY)) { }
 	explicit ScreenPoint(const Vector2& InPos) : ScreenPoint(InPos.X, InPos.Y) {}
@@ -28,8 +28,8 @@ public:
 	FORCEINLINE ScreenPoint operator-(const ScreenPoint& InPoint) const;
 	FORCEINLINE ScreenPoint operator+(const ScreenPoint& InPoint) const;
 
-	int X;
-	int Y;
+	int X = 0;
+	int Y = 0;
 };
 
 FORCEINLINE ScreenPoint ScreenPoint::operator-(const ScreenPoint& InPoint) const

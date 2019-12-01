@@ -2,8 +2,6 @@
 
 #include "RenderingSoftwareInterface.h"
 #include "InputManager.h"
-#include "GameObject.h"
-#include "Camera.h"
 
 class SoftRendererImpl3D
 {
@@ -18,13 +16,11 @@ public:
 	void UpdateImpl(float DeltaSeconds);
 
 private:
+	FORCEINLINE void DrawGizmo3D(Matrix4x4 InVMatrix, Matrix4x4 InPMatrix);
+
+private:
+	class SoftRenderer* Owner = nullptr;
 	RenderingSoftwareInterface* RSI = nullptr;
-
-	GameObject cube;
-	GameObject box;
-	GameObject box2;
-
-	Camera camera;
 
 	// 2D Grid Options
 	int Grid2DUnit = 10;
@@ -33,4 +29,10 @@ private:
 	// Input Manager
 	InputManager InputManager;
 
+	// Resource
+	std::unique_ptr<Mesh> SharedCubeMesh;
+
+	// GameObject
+	std::vector<std::unique_ptr<GameObject>> Scene;
+	Camera Camera;
 };

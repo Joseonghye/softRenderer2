@@ -9,10 +9,10 @@ enum class BlendingModes
 struct VertexData
 {
 public:
-	VertexData() {}
-	explicit VertexData(Vector4 InPosition) : Position(InPosition) {}
-	explicit VertexData(Vector4 InPosition, LinearColor InColor) : Position(InPosition), Color(InColor) {}
-	explicit VertexData(Vector4 InPosition, LinearColor InColor, Vector2 InUV) : Position(InPosition), Color(InColor), UV(InUV) {}
+	VertexData() { }
+	explicit VertexData(Vector4 InPosition) : Position(InPosition) { }
+	explicit VertexData(Vector4 InPosition, LinearColor InColor) : Position(InPosition), Color(InColor) { }
+	explicit VertexData(Vector4 InPosition, LinearColor InColor, Vector2 InUV) : Position(InPosition), Color(InColor), UV(InUV) { }
 
 	Vector4 Position;
 	LinearColor Color = LinearColor::Error;

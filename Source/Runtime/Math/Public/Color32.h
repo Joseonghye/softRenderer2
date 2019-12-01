@@ -8,7 +8,7 @@ struct Color32
 public:
 
 	Color32() { R = G = B = A = 0; }
-	constexpr FORCEINLINE Color32(BYTE InR, BYTE InG, BYTE InB, BYTE InA = 255) : B(InB), G(InG), R(InR), A(InA) { }
+	FORCEINLINE explicit Color32(BYTE InR, BYTE InG, BYTE InB, BYTE InA = 255) : B(InB), G(InG), R(InR), A(InA) { }
 	FORCEINLINE explicit Color32(unsigned long InColor)
 	{
 		GetColorRef() = InColor;

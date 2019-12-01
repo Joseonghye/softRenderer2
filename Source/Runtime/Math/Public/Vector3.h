@@ -5,7 +5,7 @@
 struct Vector3
 {
 public:
-	Vector3() { }
+	Vector3() = default;
 	FORCEINLINE Vector3(const Vector2& InV, bool IsPoint = true) : X(InV.X), Y(InV.Y) { Z = IsPoint ? 1.f : 0.f; }
 	constexpr FORCEINLINE Vector3(float InX, float InY, float InZ) : X(InX), Y(InY), Z(InZ) { }
 
@@ -30,12 +30,40 @@ public:
 	FORCEINLINE Vector3 operator+(const Vector3& InV) const;
 	FORCEINLINE Vector3 operator-(const Vector3& InV) const;
 	FORCEINLINE Vector3& operator+=(const Vector3& InV);
+	FORCEINLINE Vector3& operator/=(float InScale);
+	FORCEINLINE float GetMax() const
+	{ 
+		if (X >= Y) 
+		{ 
+			if (X >= Z)
+			{
+				return X;
+			}
+			else
+			{
+				return Z;
+			}
+		}
+		else
+		{
+			if (Y >= Z)
+			{
+				return Y;
+			}
+			else
+			{
+				return Z;
+			}
+		}
+	}
 
 	static const Vector3 UnitX;
 	static const Vector3 UnitY;
 	static const Vector3 UnitZ;
 	static const Vector3 One;
 	static const Vector3 Zero;
+	static const Vector3 Infinity;
+	static const Vector3 InfinityNeg;
 
 public:
 	float X = 0.f;
@@ -82,6 +110,14 @@ FORCEINLINE Vector3& Vector3::operator+=(const Vector3& InV)
 	X += InV.X;
 	Y += InV.Y;
 	Z += InV.Z;
+	return *this;
+}
+
+inline Vector3 & Vector3::operator/=(float InScale)
+{
+	X /= InScale;
+	Y /= InScale;
+	Z /= InScale;
 	return *this;
 }
 

@@ -57,6 +57,46 @@ void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, 
 	ScreenPoint startPos = ScreenPoint::ToScreenCoordinate(ScreenSize, InStartPos);
 	ScreenPoint endPos = ScreenPoint::ToScreenCoordinate(ScreenSize, InEndPos);
 
+	if (startPos.X < 0)
+	{
+		startPos.X = 0;
+	}
+
+	if (startPos.X > ScreenSize.X)
+	{
+		startPos.X = ScreenSize.X;
+	}
+
+	if (startPos.Y < 0)
+	{
+		startPos.Y = 0;
+	}
+
+	if (startPos.Y > ScreenSize.Y)
+	{
+		startPos.Y = ScreenSize.Y;
+	}
+
+	if (endPos.X < 0)
+	{
+		endPos.X = 0;
+	}
+
+	if (endPos.X > ScreenSize.X)
+	{
+		endPos.X = ScreenSize.X;
+	}
+
+	if (endPos.Y < 0)
+	{
+		endPos.Y = 0;
+	}
+
+	if (endPos.Y > ScreenSize.Y)
+	{
+		endPos.Y = ScreenSize.Y;
+	}
+
 	int w = endPos.X - startPos.X;
 	int h = endPos.Y - startPos.Y;
 
@@ -112,6 +152,148 @@ void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, 
 	}
 }
 
+void WindowsRSI::SetUniformMatrix(Matrix4x4 * InMatrixBuffer)
+{
+	ModelingMatrix = InMatrixBuffer[0];
+	ViewMatrix = InMatrixBuffer[1];
+	ProjectionMatrix = InMatrixBuffer[2];
+}
+
+void WindowsRSI::SetVertexBuffer(VertexData * InVertexBuffer)
+{
+	VertexBuffer = InVertexBuffer;
+}
+
+void WindowsRSI::SetIndexBuffer(int * InIndexBuffer)
+{
+	IndexBuffer = InIndexBuffer;
+}
+
+void WindowsRSI::DrawLinePrimitive(UINT InVertexSize, UINT InIndexSize, float InThickness)
+{
+	Matrix4x4 FinalMatrix = ProjectionMatrix * ViewMatrix * ModelingMatrix;
+
+	if (InThickness == 1.f)
+	{
+		int lineCount = InIndexSize / 2;
+		for (int l = 0; l < lineCount; l++)
+		{
+			Vector4 lp[2];
+			lp[0] = VertexBuffer[IndexBuffer[l * 2]].Position;
+			lp[1] = VertexBuffer[IndexBuffer[l * 2 + 1]].Position;
+
+			LinearColor c = VertexBuffer[IndexBuffer[l * 2]].Color;
+
+			for (int li = 0; li < 2; li++)
+			{
+				lp[li] = FinalMatrix * lp[li];
+				float invW = 1.f / lp[li].W;
+				lp[li].X *= invW;
+				lp[li].Y *= invW;
+				lp[li].Z *= invW;
+			}
+
+			// Strech to ScreenSize
+			for (int li = 0; li < 2; li++)
+			{
+				lp[li].X *= (ScreenSize.X * 0.5f);
+				lp[li].Y *= (ScreenSize.Y * 0.5f);
+			}
+
+			DrawLine(lp[0].ToVector2(), lp[1].ToVector2(), c);
+		}
+	}
+	else
+	{
+		// 네 점을 구한 후 삼각형 두 개를 그려서 완성하기.
+
+		float halfThickness = InThickness * 0.5f;
+
+		int lineCount = InIndexSize / 2;
+		for (int l = 0; l < lineCount; l++)
+		{
+			Vector4 lp[2];
+			lp[0] = VertexBuffer[IndexBuffer[l * 2]].Position;
+			lp[1] = VertexBuffer[IndexBuffer[l * 2 + 1]].Position;
+			LinearColor c = VertexBuffer[IndexBuffer[l * 2]].Color;
+
+			for (int li = 0; li < 2; li++)
+			{
+				lp[li] = FinalMatrix * lp[li];
+				float invW = 1.f / lp[li].W;
+				lp[li].X *= invW;
+				lp[li].Y *= invW;
+				lp[li].Z *= invW;
+			}
+
+			// Strech to ScreenSize
+			for (int li = 0; li < 2; li++)
+			{
+				lp[li].X *= (ScreenSize.X * 0.5f);
+				lp[li].Y *= (ScreenSize.Y * 0.5f);
+			}
+
+			Vector2 screenLP[2] = { lp[0].ToVector2(), lp[1].ToVector2() };
+			Vector2 line = (screenLP[1] - screenLP[0]).Normalize() * halfThickness;
+			Vector2 inv90RotLine = Vector2(line.Y, -line.X);
+			Vector2 screenQuad[4] = {
+				screenLP[0] + inv90RotLine,
+				screenLP[0] - inv90RotLine,
+				screenLP[1] + inv90RotLine,
+				screenLP[1] - inv90RotLine
+			};
+		}
+
+
+	}
+}
+
+void WindowsRSI::DrawTrianglePrimitive(UINT InVertexSize, UINT InIndexSize)
+{
+	Matrix4x4 FinalMatrix = ProjectionMatrix * ViewMatrix * ModelingMatrix;
+
+	int triangleCount = InIndexSize / 3;
+	for (int t = 0; t < triangleCount; t++)
+	{
+		Vector4 tp[3];
+		tp[0] = VertexBuffer[IndexBuffer[t * 3]].Position;
+		tp[1] = VertexBuffer[IndexBuffer[t * 3 + 1]].Position;
+		tp[2] = VertexBuffer[IndexBuffer[t * 3 + 2]].Position;
+
+		LinearColor c = VertexBuffer[IndexBuffer[t * 3]].Color;
+
+		for (int ti = 0; ti < 3; ti++)
+		{
+			tp[ti] = FinalMatrix * tp[ti];
+			float invW = 1.f / tp[ti].W;
+			tp[ti].X *= invW;
+			tp[ti].Y *= invW;
+			tp[ti].Z *= invW;
+		}
+
+		// Backface Culling
+		Vector3 edge1 = (tp[1] - tp[0]).ToVector3();
+		Vector3 edge2 = (tp[2] - tp[0]).ToVector3();
+		Vector3 faceNormal = edge2.Cross(edge1).Normalize();
+		static Vector3 cameraDir = -Vector3::UnitZ;
+		if (cameraDir.Dot(faceNormal) < 0.f)
+		{
+			continue;
+		}
+
+		// Strech to ScreenSize
+		for (int ti = 0; ti < 3; ti++)
+		{
+			tp[ti].X *= (ScreenSize.X * 0.5f);
+			tp[ti].Y *= (ScreenSize.Y * 0.5f);
+		}
+
+		DrawLine(tp[0].ToVector2(), tp[1].ToVector2(), c);
+		DrawLine(tp[0].ToVector2(), tp[2].ToVector2(), c);
+		DrawLine(tp[1].ToVector2(), tp[2].ToVector2(), c);
+	}
+}
+
 void WindowsRSI::DrawFullVerticalLine(int InX, const LinearColor & InColor)
 {
 	if (InX < 0 || InX >= ScreenSize.X)
@@ -137,63 +319,6 @@ void WindowsRSI::DrawFullHorizontalLine(int InY, const LinearColor & InColor)
 	for (int x = 0; x < ScreenSize.X; ++x)
 	{
 		SetPixel(ScreenPoint(x, InY), InColor);
-	}
-}
-
-void WindowsRSI::SetUniformMatrix(Matrix4x4 * InMatrixData)
-{
-	UniformMatrix = InMatrixData[0] * InMatrixData[1] * InMatrixData[2];
-}
-
-void WindowsRSI::SetVertexBuffer(VertexData * InVertexData)
-{
-	Vertices = InVertexData;
-}
-
-void WindowsRSI::SetIndexBuffer(int * InIndexData)
-{
-	Indices = InIndexData;
-}
-
-void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
-{
-	for (int t = 0; t < InIndexSize / 3; t++)
-	{
-		VertexData tp[3];
-		tp[0] = Vertices[Indices[t * 3]];
-		tp[1] = Vertices[Indices[t * 3 + 1]];
-		tp[2] = Vertices[Indices[t * 3 + 2]];
-
-		for (int ti = 0; ti < 3; ti++)
-		{
-			tp[ti].Position = UniformMatrix * tp[ti].Position;
-			float repW = 1.f / tp[ti].Position.W;
-
-			tp[ti].Position.X *= repW;
-			tp[ti].Position.Y *= repW;
-			tp[ti].Position.Z *= repW;
-		}
-
-		//BackFace Culling
-		Vector3 edge1 = (tp[1].Position - tp[0].Position).ToVector3();
-		Vector3 edge2 = (tp[2].Position - tp[0].Position).ToVector3();
-
-		Vector3 normal = -edge2.Cross(edge1).Normalize();
-		Vector3 camera = -Vector3::UnitZ;
-
-		if (camera.Dot(normal) <= 0.f)
-		{
-			// 종횡비가 다르기에 원래대로 맞춰주기 위해서 
-			for (int ti = 0; ti < 3; ti++)
-			{
-				tp[ti].Position.X *= (ScreenSize.X * 0.5f);
-				tp[ti].Position.Y *= (ScreenSize.Y * 0.5f);
-			}
-
-			DrawLine(tp[0].Position.ToVector2(), tp[1].Position.ToVector2(), LinearColor::Red);
-			DrawLine(tp[0].Position.ToVector2(), tp[2].Position.ToVector2(), LinearColor::Red);
-			DrawLine(tp[1].Position.ToVector2(), tp[2].Position.ToVector2(), LinearColor::Red);
-		}
 	}
 }
 
